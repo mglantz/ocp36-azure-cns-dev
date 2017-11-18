@@ -150,84 +150,6 @@ fi
 # Create Ansible Hosts File
 echo $(date) " - Create Ansible Hosts file"
 
-if [ $MASTERCOUNT -eq 1 ]
-then
-
-cat > /etc/ansible/hosts <<EOF
-# Create an OSEv3 group that contains the masters and nodes groups
-[OSEv3:children]
-masters
-nodes
-nfs
-
-# Set variables common for all OSEv3 hosts
-[OSEv3:vars]
-ansible_ssh_user=$SUDOUSER
-ansible_become=yes
-openshift_install_examples=true
-deployment_type=openshift-enterprise
-docker_udev_workaround=true
-openshift_use_dnsmasq=true
-openshift_disable_check=disk_availability
-openshift_master_default_subdomain=$ROUTING
-openshift_override_hostname_check=true
-osm_use_cockpit=true
-os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
-
-openshift_master_cluster_hostname=$MASTERPUBLICIPHOSTNAME
-openshift_master_cluster_public_hostname=$MASTERPUBLICIPHOSTNAME
-#openshift_master_cluster_public_vip=$MASTERPUBLICIPADDRESS
-
-# Enable HTPasswdPasswordIdentityProvider
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-
-# Configure persistent storage via nfs server on master
-openshift_hosted_registry_storage_kind=nfs
-openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
-openshift_hosted_registry_storage_host=$MASTER-0.$DOMAIN
-openshift_hosted_registry_storage_nfs_directory=/exports
-openshift_hosted_registry_storage_volume_name=registry
-openshift_hosted_registry_storage_volume_size=5Gi
-
-# Setup metrics
-openshift_hosted_metrics_deploy=true
-# As of this writing, there's a bug in the metrics deployment.
-# You'll see the metrics failing to deploy 59 times, it will, though, succeed the 60'th time.
-openshift_hosted_metrics_storage_kind=nfs
-openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
-openshift_hosted_metrics_storage_host=$MASTER-0.$DOMAIN
-openshift_hosted_metrics_storage_nfs_directory=/exports
-openshift_hosted_metrics_storage_volume_name=metrics
-openshift_hosted_metrics_storage_volume_size=10Gi
-openshift_hosted_metrics_public_url=https://metrics.$ROUTING/hawkular/metrics
-
-# Setup logging
-openshift_hosted_logging_deploy=true
-openshift_hosted_logging_storage_kind=nfs
-openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
-openshift_hosted_logging_storage_host=$MASTER-0.$DOMAIN
-openshift_hosted_logging_storage_nfs_directory=/exports
-openshift_hosted_logging_storage_volume_name=logging
-openshift_hosted_logging_storage_volume_size=10Gi
-openshift_master_logging_public_url=https://kibana.$ROUTING
-
-# host group for masters
-[masters]
-$MASTER-0.$DOMAIN
-
-[nfs]
-$MASTER-0.$DOMAIN
-
-# host group for nodes
-[nodes]
-$MASTER-0.$DOMAIN openshift_node_labels="{'region': 'master', 'zone': 'default'}"
-$INFRA-0.$DOMAIN openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-EOF
-for node in ocpn-{0..30}; do
-	echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') openshift_node_labels=\"{\'region\': \'nodes\', \'zone\': \'default\'}\"
-done|grep ocpn >>/etc/ansible/hosts
-
-else
 
 cat > /etc/ansible/hosts <<EOF
 # Create an OSEv3 group that contains the masters and nodes groups
@@ -238,6 +160,7 @@ etcd
 nfs
 lb
 glusterfs
+glusterfs-registry
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
@@ -261,8 +184,8 @@ openshift_master_cluster_public_hostname=$MASTERPUBLICIPHOSTNAME
 # Enable HTPasswdPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 
-# Configure persistent storage via nfs server on master
-openshift_hosted_registry_storage_kind=nfs
+# Configure persistent storage via glusterfs on infra nodes
+openshift_hosted_registry_storage_kind=glusterfs
 openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
 openshift_hosted_registry_storage_host=$MASTER-0.$DOMAIN
 openshift_hosted_registry_storage_nfs_directory=/exports
@@ -273,22 +196,22 @@ openshift_hosted_registry_storage_volume_size=5Gi
 openshift_hosted_metrics_deploy=true
 # As of this writing, there's a bug in the metrics deployment.
 # You'll see the metrics failing to deploy 59 times, it will, though, succeed the 60'th time.
-openshift_hosted_metrics_storage_kind=nfs
-openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
-openshift_hosted_metrics_storage_host=$MASTER-0.$DOMAIN
-openshift_hosted_metrics_storage_nfs_directory=/exports
-openshift_hosted_metrics_storage_volume_name=metrics
-openshift_hosted_metrics_storage_volume_size=10Gi
+openshift_hosted_metrics_storage_kind=dynamic
+#openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
+#openshift_hosted_metrics_storage_host=$MASTER-0.$DOMAIN
+#openshift_hosted_metrics_storage_nfs_directory=/exports
+#openshift_hosted_metrics_storage_volume_name=metrics
+#openshift_hosted_metrics_storage_volume_size=10Gi
 openshift_hosted_metrics_public_url=https://hawkular-metrics.$ROUTING/hawkular/metrics
 
 # Setup logging
 openshift_hosted_logging_deploy=true
-openshift_hosted_logging_storage_kind=nfs
-openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
-openshift_hosted_logging_storage_host=$MASTER-0.$DOMAIN
-openshift_hosted_logging_storage_nfs_directory=/exports
-openshift_hosted_logging_storage_volume_name=logging
-openshift_hosted_logging_storage_volume_size=10Gi
+openshift_hosted_logging_storage_kind=dynamic
+#openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
+#openshift_hosted_logging_storage_host=$MASTER-0.$DOMAIN
+#openshift_hosted_logging_storage_nfs_directory=/exports
+#openshift_hosted_logging_storage_volume_name=logging
+#openshift_hosted_logging_storage_volume_size=10Gi
 openshift_master_logging_public_url=https://kibana.$ROUTING
 
 # host group for masters
@@ -325,11 +248,19 @@ done|grep ocpi >>/etc/ansible/hosts
 for node in ocpn-{0..30}; do
 	echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') openshift_node_labels=\"{\'region\': \'nodes\', \'zone\': \'default\'}\"
 done|grep ocpn >>/etc/ansible/hosts
-fi
+
+echo >>/etc/ansible/hosts
 
 echo "[glusterfs]" >>/etc/ansible/hosts
 for node in ocpi-{0..10}; do
         echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sde\", \"/dev/sdd\", \"/dev/sdf\" ]\'
+done|grep ocpi >>/etc/ansible/hosts
+
+echo >>/etc/ansible/hosts
+
+echo "[glusterfs-registry]" >>/etc/ansible/hosts
+for node in ocpi-{0..10}; do
+        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sdg\" ]\'
 done|grep ocpi >>/etc/ansible/hosts
 
 # Create and distribute hosts file to all nodes, this is due to us having to use 
@@ -363,12 +294,6 @@ echo $(date) " - Modifying sudoers"
 
 sed -i -e "s/Defaults    requiretty/# Defaults    requiretty/" /etc/sudoers
 sed -i -e '/Defaults    env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"/aDefaults    env_keep += "PATH"' /etc/sudoers
-
-# Deploying Registry
-echo $(date) "- Registry deployed to infra node"
-
-# Deploying Router
-echo $(date) "- Router deployed to infra nodes"
 
 echo $(date) "- Re-enabling requiretty"
 
@@ -424,5 +349,8 @@ then
 		fi
 	done
 fi
+
+# Add redeploy of metrics and logging
+
 
 echo $(date) " - Script complete"
