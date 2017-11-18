@@ -192,20 +192,20 @@ openshift_hosted_registry_storage_kind=glusterfs
 #openshift_hosted_registry_storage_volume_name=registry
 #openshift_hosted_registry_storage_volume_size=5Gi
 
-# Setup metrics
-openshift_hosted_metrics_deploy=true
+# OpenShift 3.6 does not support install of metrics on CNS, we need to do that later.
+openshift_hosted_metrics_deploy=false
 # As of this writing, there's a bug in the metrics deployment.
 # You'll see the metrics failing to deploy 59 times, it will, though, succeed the 60'th time.
-openshift_hosted_metrics_storage_kind=dynamic
+#openshift_hosted_metrics_storage_kind=dynamic
 #openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
 #openshift_hosted_metrics_storage_host=$MASTER-0.$DOMAIN
 #openshift_hosted_metrics_storage_nfs_directory=/exports
 #openshift_hosted_metrics_storage_volume_name=metrics
 #openshift_hosted_metrics_storage_volume_size=10Gi
-openshift_hosted_metrics_public_url=https://hawkular-metrics.$ROUTING/hawkular/metrics
+#openshift_hosted_metrics_public_url=https://hawkular-metrics.$ROUTING/hawkular/metrics
 
-# Setup logging
-openshift_hosted_logging_deploy=true
+# OpenShift 3.6 does not support install of logging on CNS, we need to do that later.
+openshift_hosted_logging_deploy=false
 openshift_hosted_logging_storage_kind=dynamic
 #openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
 #openshift_hosted_logging_storage_host=$MASTER-0.$DOMAIN
@@ -348,7 +348,10 @@ for item in ocpm-0 ocpm-1 ocpm-2; do
 	fi
 done
 
-# Add redeploy of metrics and logging
+# Enable logging
+runuser -l $SUDOUSER -c "ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml -e openshift_logging_install_logging=True -e openshift_hosted_logging_storage_kind=dynamic -e openshift_master_logging_public_url=https://kibana.$ROUTING -e openshift_logging_es_pvc_dynamic=True"
 
+# Enable metrics
+runuser -l $SUDOUSER -c "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_hawkular_hostname=hawkular-metrics.$ROUTING -e openshift_metrics_cassandra_storage_type=pv"
 
 echo $(date) " - Script complete"
