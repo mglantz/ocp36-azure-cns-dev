@@ -8,7 +8,7 @@
 				"description": "Base URL for Template Files",
 				"artifactsBaseUrl": ""
 			},
-			"defaultValue": "https://raw.githubusercontent.com/mglantz/ocp36-azure-cns/master/"
+			"defaultValue": "https://raw.githubusercontent.com/mglantz/ocp36-azure-cns-dev/master/"
 		},
 		"masterVmSize": {
 			"type": "string",

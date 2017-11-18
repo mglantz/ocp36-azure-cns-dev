@@ -88,7 +88,7 @@ cat > azuredeploy.parameters.json << EOF
         "contentVersion": "1.0.0.0",
         "parameters": {
                 "_artifactsLocation": {
-                        "value": "https://raw.githubusercontent.com/mglantz/ocp36-azure-cns/master/"
+                        "value": "https://raw.githubusercontent.com/mglantz/ocp36-azure-cns-dev/master/"
                 },
                 "masterVmSize": {
                         "value": "Standard_DS4_v2"
