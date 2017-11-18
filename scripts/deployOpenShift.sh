@@ -157,7 +157,6 @@ cat > /etc/ansible/hosts <<EOF
 masters
 nodes
 etcd
-nfs
 lb
 glusterfs
 glusterfs-registry
@@ -206,7 +205,7 @@ openshift_hosted_metrics_deploy=false
 
 # OpenShift 3.6 does not support install of logging on CNS, we need to do that later.
 openshift_hosted_logging_deploy=false
-openshift_hosted_logging_storage_kind=dynamic
+#openshift_hosted_logging_storage_kind=dynamic
 #openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
 #openshift_hosted_logging_storage_host=$MASTER-0.$DOMAIN
 #openshift_hosted_logging_storage_nfs_directory=/exports
@@ -230,9 +229,6 @@ for node in ocpm-{0..3}; do
 done|grep ocpm >>/etc/ansible/hosts
 
 cat >> /etc/ansible/hosts <<EOF
-[nfs]
-$MASTER-0.$DOMAIN
-
 [lb]
 $BASTION
 
