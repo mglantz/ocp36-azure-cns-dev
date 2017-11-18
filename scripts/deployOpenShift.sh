@@ -350,4 +350,9 @@ runuser -l $SUDOUSER -c "ansible-playbook -i /etc/ansible/hosts /usr/share/ansib
 # Enable metrics
 runuser -l $SUDOUSER -c "ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_hawkular_hostname=hawkular-metrics.$ROUTING -e openshift_metrics_cassandra_storage_type=pv"
 
+# Assigning cluster admin rights to OpenShift user
+echo $(date) "- Assigning cluster admin rights to user, again, haha."
+
+runuser -l $SUDOUSER -c "ansible-playbook ~/postinstall2.yml"
+
 echo $(date) " - Script complete"
