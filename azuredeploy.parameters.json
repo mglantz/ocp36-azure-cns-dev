@@ -33,7 +33,7 @@
 			"value": 20
 		},
 		"dataDiskSizeCnsRegistry": {
-			"value": 20
+			"value": 5
 		},
 		"adminUsername": {
 			"value": "OCP_USER"

@@ -1,0 +1,21 @@
+Default value to 5
+
+# Added CNS for Registry
+# Will put registry on glusterfs, first steps for metrics, logging
+# --------------
+# Please enter the commit message for your changes. Everything below
+# this paragraph is ignored, and an empty message aborts the commit.
+# Just close the window to accept your message.
+diff --git a/azuredeploy.parameters.json b/azuredeploy.parameters.json
+index 0ed7c35..8a4bf2c 100644
+--- a/azuredeploy.parameters.json
++++ b/azuredeploy.parameters.json
+@@ -33,7 +33,7 @@
+ 			"value": 20
+ 		},
+ 		"dataDiskSizeCnsRegistry": {
+-			"value": 20
++			"value": 5
+ 		},
+ 		"adminUsername": {
+ 			"value": "OCP_USER"
