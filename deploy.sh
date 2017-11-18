@@ -117,6 +117,9 @@ cat > azuredeploy.parameters.json << EOF
 		"dataDiskSizeCns": {
 			"value": $DISKSIZECNS
 		},
+		"dataDiskSizeCnsRegistry": {
+			"value": $DISKSIZECNSREGISTRY
+		},
 		"adminUsername": {
 			"value": "$OCP_USER"
 		},

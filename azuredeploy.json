@@ -108,6 +108,15 @@
                 "description": "Size of Datadisk in GB for 3x CNS gluster volumes"
             }
         },
+        "dataDiskSizeCnsRegistry": {
+            "type": "int",
+            "defaultValue": 5,
+            "minValue": 1,
+            "allowedValues": [5, 10, 20, 50, 60, 70, 80, 90, 100, 128, 512, 1023],
+            "metadata": {
+                "description": "Size of Datadisk in GB for 3x CNS gluster volumes"
+            }
+        }, 
 		"adminUsername": {
 			"type": "string",
 			"defaultValue": "ocpadmin",
@@ -1227,12 +1236,21 @@
                         			},
                                         	"createOption": "Empty"
 					},
-                    			{
+					{
                         			"name": "[concat(variables('openshiftNodeHostname'), copyIndex(), '-glusterfs-pool3')]",
                         			"diskSizeGB": "[parameters('dataDiskSizeCns')]",
                         			"lun": 3,
                         			"vhd": {
-                            				"uri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('newStorageAccountNode')), variables('apiVersionStorage')).primaryEndpoints['blob'], 'vhds/'), variables('openshiftNodeHostname'), copyIndex(), '-glusterfs3-pool.vhd')]"
+                            				"uri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('newStorageAccountNode')), variables('apiVersionStorage')).primaryEndpoints['blob'], 'vhds/'), variables('openshiftNodeHostname'), copyIndex(), '-glusterfs-pool3.vhd')]"
+                        			},
+                                        	"createOption": "Empty"
+					},
+                    			{
+                        			"name": "[concat(variables('openshiftNodeHostname'), copyIndex(), '-registry-pool')]",
+                        			"diskSizeGB": "[parameters('dataDiskSizeCnsRegistry')]",
+                        			"lun": 4,
+                        			"vhd": {
+                            				"uri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('newStorageAccountNode')), variables('apiVersionStorage')).primaryEndpoints['blob'], 'vhds/'), variables('openshiftNodeHostname'), copyIndex(), '-registry-pool.vhd')]"
                        			 	},
                         			 "createOption": "Empty"
                     			}]
