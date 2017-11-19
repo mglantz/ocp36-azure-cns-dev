@@ -158,7 +158,7 @@ masters
 nodes
 etcd
 lb
-glusterfs
+#glusterfs
 glusterfs-registry
 
 # Set variables common for all OSEv3 hosts
@@ -247,16 +247,16 @@ done|grep ocpn >>/etc/ansible/hosts
 
 echo >>/etc/ansible/hosts
 
-echo "[glusterfs]" >>/etc/ansible/hosts
-for node in ocpi-{0..10}; do
-        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sde\", \"/dev/sdd\", \"/dev/sdf\" ]\'
-done|grep ocpi >>/etc/ansible/hosts
-
-echo >>/etc/ansible/hosts
+#echo "[glusterfs]" >>/etc/ansible/hosts
+#for node in ocpi-{0..10}; do
+#        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sde\", \"/dev/sdd\", \"/dev/sdf\" ]\'
+#done|grep ocpi >>/etc/ansible/hosts
+#
+#echo >>/etc/ansible/hosts
 
 echo "[glusterfs-registry]" >>/etc/ansible/hosts
 for node in ocpi-{0..10}; do
-        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sdg\" ]\'
+        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sde\", \"/dev/sdd\", \"/dev/sdf\" ]\'
 done|grep ocpi >>/etc/ansible/hosts
 
 # Create and distribute hosts file to all nodes, this is due to us having to use 
