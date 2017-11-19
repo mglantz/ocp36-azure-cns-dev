@@ -245,14 +245,14 @@ for node in ocpn-{0..30}; do
 	echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') openshift_node_labels=\"{\'region\': \'nodes\', \'zone\': \'default\'}\"
 done|grep ocpn >>/etc/ansible/hosts
 
-echo >>/etc/ansible/hosts
+#echo >>/etc/ansible/hosts
 
 #echo "[glusterfs]" >>/etc/ansible/hosts
 #for node in ocpi-{0..10}; do
 #        echo $(ping -c 1 $node 2>/dev/null|grep ocp|grep PING|awk '{ print $2 }') glusterfs_devices=\'[ \"/dev/sde\", \"/dev/sdd\", \"/dev/sdf\" ]\'
 #done|grep ocpi >>/etc/ansible/hosts
-#
-#echo >>/etc/ansible/hosts
+
+echo >>/etc/ansible/hosts
 
 echo "[glusterfs-registry]" >>/etc/ansible/hosts
 for node in ocpi-{0..10}; do
